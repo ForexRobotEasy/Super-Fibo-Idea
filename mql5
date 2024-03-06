@@ -1,0 +1,101 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                            Super Fibo Idea.mq5   |
+//|                               Copyright 2022, Forex Robot Easy   |
+//|                                             forexroboteasy.com   |
+//+------------------------------------------------------------------+
+
+//+------------------------------------------------------------------+
+//|                                   Custom Fibonacci Retracement   |
+//+------------------------------------------------------------------+
+double[] CalculateFibonacciLevels(double[] highs, double[] lows)
+{
+    int totalBars = MathMin(ArraySize(highs), ArraySize(lows));
+    double[] fibonacciLevels;
+    
+    ArrayResize(fibonacciLevels, totalBars);
+    
+    for (int i = 1; i < totalBars; i++)
+    {
+        double range = highs[i] - lows[i];
+        
+        double fibonacci23 = lows[i] + (range * 0.236);
+        double fibonacci38 = lows[i] + (range * 0.382);
+        double fibonacci50 = lows[i] + (range * 0.5);
+        double fibonacci61 = lows[i] + (range * 0.618);
+        
+        fibonacciLevels[i] = fibonacci23;
+        fibonacciLevels[i+1] = fibonacci38;
+        fibonacciLevels[i+2] = fibonacci50;
+        fibonacciLevels[i+3] = fibonacci61;
+    }
+    
+    return fibonacciLevels;
+}
+
+//+------------------------------------------------------------------+
+//|                                       Scanning System for Entry  |
+//+------------------------------------------------------------------+
+void ScanForEntryPoints(double[] fibonacciLevels, double currentPrice)
+{
+    for (int i = 0; i < ArraySize(fibonacciLevels); i++)
+    {
+        double supportLevel = fibonacciLevels[i];
+        double resistanceLevel = fibonacciLevels[i+2];
+        
+        if (currentPrice >= supportLevel && currentPrice <= resistanceLevel)
+        {
+            if (currentPrice <= fibonacciLevels[i+1])
+            {
+                // Potential entry point for buying
+                // Add your trading logic here
+            }
+            
+            if (currentPrice >= fibonacciLevels[i+3])
+            {
+                // Potential entry point for selling
+                // Add your trading logic here
+            }
+        }
+    }
+}
+
+//+------------------------------------------------------------------+
+//|                                      Trading Panel Implementation|
+//+------------------------------------------------------------------+
+void OnChartEvent(const int id, const long& lparam, const double& dparam, const string& sparam)
+{
+    if (id == CHARTEVENT_CLICK)
+    {
+        if (sparam == 'Buy')
+        {
+            // Execute buy trade
+            // Add your trading logic here
+        }
+        
+        if (sparam == 'Sell')
+        {
+            // Execute sell trade
+            // Add your trading logic here
+        }
+    }
+}
+
+//+------------------------------------------------------------------+
+//|                                             Super Fibo Idea      |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+    double[] highs;
+    double[] lows;
+    
+    // Collect highs and lows data from the currency market
+    // Add your data collection logic here
+    
+    double[] fibonacciLevels = CalculateFibonacciLevels(highs, lows);
+    
+    double currentPrice = MarketInfo(_Symbol, MODE_BID);
+    
+    ScanForEntryPoints(fibonacciLevels, currentPrice);
+}
+
